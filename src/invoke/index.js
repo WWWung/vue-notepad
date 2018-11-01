@@ -1,6 +1,5 @@
 import axios from "axios"
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-
 const invoke = (URL, method, data) => {
     return new Promise((resolve, reject) => {
         var d = {};
@@ -17,6 +16,7 @@ const invoke = (URL, method, data) => {
                 resolve(rsl.data)
             }
         }).catch(err => {
+            alert(err)
             reject(err)
         })
     })

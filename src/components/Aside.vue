@@ -1,5 +1,11 @@
 <template>
-  <div></div>
+  <div>
+      <div id="slider">
+          <aside id="aside">
+              
+          </aside>
+      </div>
+  </div>
 </template>
 
 <script>
@@ -13,7 +19,7 @@ export default {
 
   computed: {},
 
-  mounted: {},
+  mounted () {},
 
   methods: {}
 }

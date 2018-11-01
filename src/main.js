@@ -4,15 +4,18 @@ import router from './router'
 import store from './store'
 import './registerServiceWorker'
 
-// import axios from 'axios'
-// import VueAxios from 'vue-axios'
-
-// Vue.use(VueAxios, axios)
+import './assets/css/clear.css'
+import global from './assets/js/global.js'
 
 import invoke from './invoke'
 
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+Vue.use(ElementUI)
+
 Vue.config.productionTip = false
 Vue.prototype.invoke = invoke
+Vue.prototype.global = global
 
 
 new Vue({
