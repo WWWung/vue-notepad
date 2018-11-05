@@ -1,9 +1,6 @@
 <template>
-  <div class="hello">
-    <input type="text" v-model="user.name">
-    <input type="text" v-model="user.password">
-    <img :src="src" alt="">
-    <button @click="loginIn">登录</button>
+  <div id="root">
+    
   </div>
 </template>
 
@@ -23,15 +20,16 @@ export default {
     }
   },
   mounted() {
-    this.invoke("/api/captcha.api", "captcha", {}).then(d => {
-      this.src = d.data.Base64
-    })
+    this.isLogin()
   },
   methods: {
     loginIn() {
-      this.invoke("/api/user.api", "add", {data: this.user}).then(d => {
-        console.log(d)
-      })
+      
+    },
+    isLogin() {
+      if (!this.$store.state.isLogin) {
+        this.$router.push("/signin")
+      }
     }
   }
 }

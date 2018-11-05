@@ -62,3 +62,9 @@ td {
     clear: both;
     display: block;
 }
+
+.subCenter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -7,10 +7,10 @@
         </div>
       </div>
       <div class="loginRow">
-        <input type="text" class="loginInput" placeholder="用户名" v-model="user.name">
+        <input type="text" class="loginInput" placeholder="用户名" v-model="user.name" @keydown="keyDown">
       </div>
       <div class="loginRow">
-        <input type="password" class="loginInput" placeholder="密码" v-model="user.password">
+        <input type="password" class="loginInput" placeholder="密码" v-model="user.password" @keydown="keyDown">
       </div>
       <div class="loginRow">
         <button class="signin" @click="signIn">登录</button>
@@ -26,7 +26,7 @@ export default {
     return {
       user: {
         name: "",
-        password: "123"
+        password: ""
       }
     }
   },
@@ -41,7 +41,7 @@ export default {
         return
       }
       this.invoke("/api/user.api", "login", {
-              data: this.user
+          data: this.user
         }).then(d => {
         if (d.code) {
           this.$message.error(d.data)
@@ -71,6 +71,11 @@ export default {
         this.$store.commit("setName", d.data)
         this.$router.push('/')
       })
+    },
+    keyDown(e) {
+      if (e.keyCode === 13) {
+        this.signIn()
+      }
     },
     checkData() {
       if (!this.user.name) {

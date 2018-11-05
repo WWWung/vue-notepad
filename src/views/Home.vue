@@ -1,18 +1,38 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="topBannerWrap">
+      <TopBanner />
+    </div>
+    <div class="contentWrap">
+      <Types />
+    </div>
+    <!-- <Titles /> -->
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import TopBanner from '@/components/TopBanner.vue'
+import Types from '@/components/Types.vue'
+import Titles from '@/components/Titles.vue'
 
 export default {
   name: 'home',
   components: {
-    HelloWorld
+    TopBanner,
+    Types,
+    Titles
+  },
+  mounted () {
+    if (!this.$store.state.isLogin) {
+      this.$router.push("/signin")
+    }
   }
 }
 </script>
+<style scoped>
+.contentWrap {
+  display: flex;
+}
+</style>
+

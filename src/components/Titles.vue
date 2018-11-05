@@ -1,7 +1,7 @@
 <template>
   <div>
-      <div id="slider">
-          <aside id="aside">
+      <div class="titleWrap">
+          <aside class="titleListWrap">
               
           </aside>
       </div>
@@ -26,4 +26,9 @@ export default {
 
 </script>
 <style scoped>
+.titleWrap {
+  width: 300px;
+  height: 800px;
+  background-color: #ddd;
+}
 </style>
