@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="topBannerWrap">
-      <TopBanner />
+      <TopBanner name="wwwung"/>
     </div>
     <div class="contentWrap">
       <Types />
@@ -24,8 +24,21 @@ export default {
     Titles
   },
   mounted () {
-    if (!this.$store.state.isLogin) {
-      this.$router.push("/signin")
+    this.isLogin()
+  },
+  methods: {
+    isLogin () {
+      var l = this.$loading()
+      if (!this.$store.state.isLogin) {
+        this.invoke("/api/user.api", "isLogin", null).then(d => {
+          if (d.code) {
+            this.$router.push("/signin")
+          } else {
+            this.$store.commit("setName", d.data)
+          }
+          l.close()
+        })
+      }
     }
   }
 }

@@ -5,14 +5,14 @@
             <div class="typeTitleWrap subCenter">
               <div class="createNewType subCenter" @click="showNewTypeInput">
                 <i class="typeTitleIcon"></i>
-                <input type="text" class="newTypeTitle" v-if="setNewType" v-focus @blur="getNewType" v-model="newType">
+                <input type="text" class="newTypeTitle" v-if="setNewType" v-focus @blur="addNewType" v-model="newType" placeholder="请输入类型名称">
                 <span class="typeTitle" v-else>新建笔记分类</span>
               </div>
             </div>
             <ul class="typeList">
-              <li v-for="(item, index) in data" :key="index" @click="selectType(index)" :class="item.selected ? 'selected' : ''">
+              <li v-for="(item, index) in data.rows" :key="index" @click="selectType(index)" :class="item.selected ? 'selected' : ''">
                 <i class="typeIcon"></i>
-                <span class="typeName">{{item.type}}</span>
+                <span class="typeName">{{item.name}}</span>
               </li>
             </ul>
           </div>
@@ -24,16 +24,13 @@
 export default {
   data () {
     return {
-      data: [
-        {
-          type: "Vue学习笔记",
-          selected: false
-        },
-        {
-          type: "GOlang学习笔记",
-          selected: false
-        }
-      ],
+      data: {
+        pageCount: 0,
+        pageIndex: 1,
+        rowsInPage: 10,
+        total: 0,
+        rows: []
+      },
       setNewType: false,
       newType: ""
     }
@@ -44,10 +41,7 @@ export default {
   computed: {},
 
   mounted () {
-    this.invoke("/api/type.api?pageIndex=1&rowsInPage=10", "getList", {}).then(d => {
-      console.log(d)
-
-    })
+    this.initData()
   },
 
   methods: {
@@ -65,31 +59,41 @@ export default {
         this.setNewType = true;
       }
     },
-    getNewType () {
-      if (this.newType) {
-        this.data.push({
-          type: this.newType,
-          selected: false
-        })
+    addNewType () {
+      if (!this.newType) {
+        return
       }
       const data = {
         data: {
           name: this.newType
         }
       }
-      this.loading = true
       this.invoke("/api/type.api", "add", data).then(d => {
-        console.log(d)
         if (d.code) {
-
+          this.$message.error(d.data)
         } else {
-
+          this.initData(() => {
+            this.$message.success("新增分类成功")
+          })
         }
-        this.loading = false
       })
       if (this.setNewType) {
         this.setNewType = false;
       }
+    },
+    initData(cb) {
+      var l = this.$loading()
+      this.invoke("/api/type.api?sort=createTime&sortDir=desc&pageIndex="+this.data.pageIndex+"&rowsInPage="+this.data.rowsInPage, "getList", {}).then(d => {
+        if (d.code) {
+          this.$message.error(d.data)
+          l.close()
+          return
+        }
+        this.data = d.data
+        this.data.rows = d.data.rows.map(item => Object.assign(item, { selected: false }))
+        l.close()
+        typeof cb === "function" && cb()
+      })
     }
   },
 
@@ -106,7 +110,7 @@ export default {
 <style scoped>
 .typeWrap {
   width: 220px;
-  height: 800px;
+  height: 100vh;
   background-color: #f5f5f5;
   box-sizing: border-box;
   border-right: 1px solid #e0e1e5;
