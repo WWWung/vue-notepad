@@ -1,0 +1,64 @@
+.editor-toolbar {
+    height: 45px;
+    padding: 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, .05);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.toolbar-sub {
+    margin: 8px;
+}
+
+.toolbar-sub:hover {
+    background-color: #aecdf5;
+}
+
+.easyFunc {
+    float: left;
+    width: 24px;
+    height: 24px;
+    background: url("../imgs/sprit.svg") no-repeat;
+}
+
+.editor-bold {
+    background-position-x: -109px;
+    background-position-y: -151px;
+}
+
+.editor-italic {
+    background-position-x: -169px;
+    background-position-y: -69px;
+}
+
+.editor-underline {
+    background-position-x: -109px;
+    background-position-y: -196px;
+}
+
+.editor-lineThrough {
+    background-position-x: -169px;
+    background-position-y: -91px;
+}
+
+.textarea {
+    padding: 20px;
+    line-height: 24px;
+    color: #1a1a1a;
+    font-size: 12px;
+    min-height: 200px;
+    background-color: #fff;
+}
+
+.textarea:focus {
+    outline: none;
+}
+
+.editor-select {
+    font-size: 12px;
+}
+
+.editor-select-options {
+    display: none;
+}

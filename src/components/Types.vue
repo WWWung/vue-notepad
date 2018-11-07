@@ -10,9 +10,10 @@
               </div>
             </div>
             <ul class="typeList">
-              <li v-for="(item, index) in data.rows" :key="index" @click="selectType(index)" :class="item.selected ? 'selected' : ''">
+              <li v-for="(item, index) in data.rows" :key="index" @click="selectType(index)" :class="index===selectedIndex ? 'selected' : ''">
                 <i class="typeIcon"></i>
                 <span class="typeName">{{item.name}}</span>
+                <el-button size="mini" type="text" class="deleteType" @click="deleteType($event, index)">删除</el-button>
               </li>
             </ul>
           </div>
@@ -22,6 +23,7 @@
 
 <script>
 export default {
+
   data () {
     return {
       data: {
@@ -32,7 +34,8 @@ export default {
         rows: []
       },
       setNewType: false,
-      newType: ""
+      newType: "",
+      selectedIndex: -1
     }
   },
 
@@ -46,13 +49,18 @@ export default {
 
   methods: {
     selectType (index) {
-      this.data.forEach((item, i) => {
-        if (i === index) {
-          item.selected = true
-        } else {
-          item.selected = false
-        }
-      })
+      this.selectedIndex = index
+      // return
+      // var id = this.data.rows[index].id
+      // this.data.rows.forEach((item, i) => {
+      //   if (i === index) {
+      //     this.data.rows[i].selected = true
+      //   } else {
+      //     this.data.rows[i].selected = false
+      //   }
+      //   this.$set(this.data.rows, i, this.data.rows[i])
+      // })
+      // this.$store.commit("setTypeId", id)
     },
     showNewTypeInput () {
       if (!this.setNewType) {
@@ -61,6 +69,7 @@ export default {
     },
     addNewType () {
       if (!this.newType) {
+        this.setNewType = false
         return
       }
       const data = {
@@ -77,12 +86,12 @@ export default {
           })
         }
       })
+      this.newType = ""
       if (this.setNewType) {
-        this.setNewType = false;
+        this.setNewType = false
       }
     },
     initData(cb) {
-      var l = this.$loading()
       this.invoke("/api/type.api?sort=createTime&sortDir=desc&pageIndex="+this.data.pageIndex+"&rowsInPage="+this.data.rowsInPage, "getList", {}).then(d => {
         if (d.code) {
           this.$message.error(d.data)
@@ -90,10 +99,13 @@ export default {
           return
         }
         this.data = d.data
-        this.data.rows = d.data.rows.map(item => Object.assign(item, { selected: false }))
-        l.close()
         typeof cb === "function" && cb()
       })
+    },
+    deleteType(e, index) {
+      //  阻止冒泡触发父集li的选中事件
+      e.stopPropagation()
+      this.data.rows.splice(index, 1)
     }
   },
 

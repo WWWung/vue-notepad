@@ -6,7 +6,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         name: "",
-        isLogin: false
+        isLogin: false,
+        typeId: "",
+        noteId: ""
     },
     mutations: {
         setName(state, name) {
@@ -16,6 +18,12 @@ export default new Vuex.Store({
         clearName(state) {
             state.isLogin = false
             state.name = ""
+        },
+        setTypeId(state, typeId) {
+            state.typeId = typeId || ""
+        },
+        setNoteId(state, noteId) {
+            state.noteId = noteId || ""
         }
     },
     actions: {

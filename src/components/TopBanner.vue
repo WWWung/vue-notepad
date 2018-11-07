@@ -36,7 +36,6 @@ export default {
                     this.$message.error(d.data);
                     return
                 }
-                console.log(d);
                 this.$router.push("/signin")
             })
         }

@@ -26,6 +26,12 @@ export default new Router({
             name: 'sign',
             component: () =>
                 import ('./views/Sign.vue')
+        },
+        {
+            path: '/editor',
+            name: 'editor',
+            component: () =>
+                import ('./components/Editor.vue')
         }
     ]
 })

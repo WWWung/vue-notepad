@@ -5,8 +5,8 @@
     </div>
     <div class="contentWrap">
       <Types />
+      <Titles />
     </div>
-    <!-- <Titles /> -->
   </div>
 </template>
 
