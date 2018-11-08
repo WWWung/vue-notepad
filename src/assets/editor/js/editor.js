@@ -6,6 +6,12 @@
 
 */
 
+const cursorPos = {
+    start: 0,
+    end: 0,
+    node: null
+}
+
 //  简单的图标
 const createEasyFunc = (toolbar, command) => {
     const wrap = document.createElement("div")
@@ -36,29 +42,75 @@ const funcs = {
         createEasyFunc(toolbar, "lineThrough")
     },
     fontSize(toolbar) {
-        var div = document.createElement("div")
+        const div = document.createElement("div")
         div.id = "editor-fontSizePicker"
         div.innerHTML = "字体大小"
-        const div = func(fragment)
-        const real = initSelect(div, "12px 14px")
-        toolbar.appendChild(real)
+        const option = {
+            ops: "1 2 3 4 5",
+            title: "字体大小",
+            onSelect: events.fontSize
+        }
+        const real = initSelect(div, option)
+
+        const sub = document.createElement("div")
+        sub.className = "toolbar-sub"
+        sub.appendChild(real)
+        toolbar.appendChild(sub)
     }
 }
 
 const events = {
     bold() {
         document.execCommand("bold", false, null)
+            // setTextareaFocusAfterClick()
     },
     italic() {
         document.execCommand("italic", false, null)
+        setTextareaFocusAfterClick()
     },
     underline() {
         document.execCommand("underline", false, null)
+        setTextareaFocusAfterClick()
     },
     lineThrough() {
         document.execCommand("strikeThrough", false, null)
+        setTextareaFocusAfterClick()
     },
+    fontSize(e, size) {
+        document.execCommand("fontSize", false, size)
+    }
 }
+
+
+//  在点击事件触发之后保持文本域focus状态，并且不丢失被选中的文字
+const setTextareaFocusAfterClick = (cursorPos) => {
+    var ses = window.getSelection()
+
+    //  当传入cursorPos对象的时候就采用对象里的值否则则获取
+    var node = cursorPos ? cursorPos.node : ses.baseNode
+    var cursorEndPos = cursorPos ? cursorPos.end : ses.focusOffset
+        //  选区的起点(如果没有选中文本那么该值等于选中的终点)
+    var cursorStartPos = cursorPos ? cursorPos.start : ses.anchorOffset
+        // node.setSelectionRange(cursorStartPos, cursorEndPos) setSelectionRange方法只针对input/textarea
+
+    //  创建一个新的选择区域
+    const range = document.createRange()
+    range.collapse(true)
+    range.setStart(node, cursorStartPos)
+    range.setEnd(node, cursorEndPos)
+        //  给对象重新赋值
+    if (cursorPos) {
+        cursorPos.node = node
+        cursorPos.end = cursorEndPos
+        cursorPos.start = cursorStartPos
+    }
+
+    //  创建一个新的selection对象
+    var selection = window.getSelection()
+    selection.removeAllRanges()
+    selection.addRange(range)
+}
+
 
 //  创建容器元素
 const initWrap = () => {
@@ -79,6 +131,12 @@ const initTextarea = () => {
     const wrap = document.createElement("div")
     wrap.className = "textarea-wrap"
     const div = document.createElement("div")
+    div.addEventListener("keyup", function() {
+        const ses = window.getSelection()
+        cursorPos.end = ses.anchorOffset
+        cursorPos.start = ses.focusOffset
+        cursorPos.node = ses.baseNode
+    })
     div.className = "textarea"
     div.contentEditable = "true"
     div.spellcheck = false
@@ -87,7 +145,7 @@ const initTextarea = () => {
 }
 
 //  解析工具栏
-const parseToolsString = (string) => {
+const parseToolsString = string => {
     const fragment = document.createDocumentFragment()
     var arr = string.split(" ")
     arr.forEach(f => {
@@ -96,7 +154,9 @@ const parseToolsString = (string) => {
     })
     return fragment
 }
-const initSelect = (node, ops) => {
+
+//  传入dom元素和配置项初始化一个下拉控件
+const initSelect = (node, obj) => {
     if (!node) {
         console.log("err")
         return
@@ -106,25 +166,63 @@ const initSelect = (node, ops) => {
 
     const div = document.createElement("div")
     div.className = "editor-select"
+        //  在鼠标点击的时候就把焦点转换到
+        // div.addEventListener("mousedown", setTextareaFocusAfterClick)
+    div.addEventListener("click", showSelectOptions)
+    document.addEventListener("click", hideSelectOptions)
 
     const icon = document.createElement("span")
-    icon.className = "editor-icon"
+    icon.className = "editor-select-icon"
+
     const textWrap = document.createElement("span")
-    textWrap.textContent = text
+    textWrap.className = "editor-select-text"
+    textWrap.textContent = obj.title
+
     div.appendChild(textWrap)
     div.appendChild(icon)
 
-    const options = ops.split(" ")
+    const options = obj && obj.ops ? obj.ops.split(" ") : []
     const ul = document.createElement("ul")
     ul.className = "editor-select-options"
-    let html = ``
     options.forEach(o => {
-        html += `<li class="editor-select-option">${o}</li>`
+        const li = document.createElement("li")
+        li.className = "editor-select-option"
+        li.innerHTML = o
+        ul.appendChild(li)
+        li.addEventListener("click", function(e) {
+            e.stopPropagation()
+            typeof obj.onSelect === "function" && obj.onSelect(e, o)
+            textWrap.textContent = o
+            setTextareaFocusAfterClick(cursorPos)
+            hideSelectOptions()
+        })
     })
-    ul.innerHTML = html
     div.appendChild(ul)
-    console.log(div)
     return div
+}
+
+//  显示下拉框
+function showSelectOptions(e) {
+    e.stopPropagation()
+    setTextareaFocusAfterClick(cursorPos)
+    const options = this.querySelector(".editor-select-options")
+    if (!options || !options.style) {
+        errHandler("下拉框添加事件失败:未找到选项")
+    }
+    options.style.display = "block"
+}
+
+//  隐藏下拉框
+function hideSelectOptions() {
+    document.querySelectorAll(".editor-select-options").forEach(list => {
+        if (list) {
+            list.style.display = "none"
+        }
+    })
+}
+
+const errHandler = err => {
+    console.error(err)
 }
 
 class Editor {
