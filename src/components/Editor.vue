@@ -22,7 +22,6 @@ export default {
         editor.init({
             el: "#editorWrap"
         })
-        console.log(editor)
     },
 
     methods: {}

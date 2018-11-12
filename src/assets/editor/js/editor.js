@@ -6,6 +6,7 @@
 
 */
 
+
 const cursorPos = {
     start: 0,
     end: 0,
@@ -81,34 +82,33 @@ const events = {
     }
 }
 
-
 //  在点击事件触发之后保持文本域focus状态，并且不丢失被选中的文字
-const setTextareaFocusAfterClick = (cursorPos) => {
-    var ses = window.getSelection()
+const setTextareaFocusAfterClick = cursorPos => {
+    // var ses = window.getSelection()
 
-    //  当传入cursorPos对象的时候就采用对象里的值否则则获取
-    var node = cursorPos ? cursorPos.node : ses.baseNode
-    var cursorEndPos = cursorPos ? cursorPos.end : ses.focusOffset
-        //  选区的起点(如果没有选中文本那么该值等于选中的终点)
-    var cursorStartPos = cursorPos ? cursorPos.start : ses.anchorOffset
-        // node.setSelectionRange(cursorStartPos, cursorEndPos) setSelectionRange方法只针对input/textarea
+    // //  当传入cursorPos对象的时候就采用对象里的值否则则获取
+    // var node = cursorPos ? cursorPos.node : ses.baseNode
+    // var cursorEndPos = cursorPos ? cursorPos.end : ses.focusOffset
+    //     //  选区的起点(如果没有选中文本那么该值等于选中的终点)
+    // var cursorStartPos = cursorPos ? cursorPos.start : ses.anchorOffset
+    //     // node.setSelectionRange(cursorStartPos, cursorEndPos) setSelectionRange方法只针对input/textarea
 
-    //  创建一个新的选择区域
-    const range = document.createRange()
-    range.collapse(true)
-    range.setStart(node, cursorStartPos)
-    range.setEnd(node, cursorEndPos)
-        //  给对象重新赋值
-    if (cursorPos) {
-        cursorPos.node = node
-        cursorPos.end = cursorEndPos
-        cursorPos.start = cursorStartPos
-    }
+    // //  创建一个新的选择区域
+    // const range = document.createRange()
+    // range.collapse(true)
+    // range.setStart(node, cursorStartPos)
+    // range.setEnd(node, cursorEndPos)
+    //     //  给对象重新赋值
+    // if (cursorPos) {
+    //     cursorPos.node = node
+    //     cursorPos.end = cursorEndPos
+    //     cursorPos.start = cursorStartPos
+    // }
 
-    //  创建一个新的selection对象
-    var selection = window.getSelection()
-    selection.removeAllRanges()
-    selection.addRange(range)
+    // //  创建一个新的selection对象
+    // var selection = window.getSelection()
+    // selection.removeAllRanges()
+    // selection.addRange(range)
 }
 
 
@@ -130,18 +130,35 @@ const initToolBarWrap = () => {
 const initTextarea = () => {
     const wrap = document.createElement("div")
     wrap.className = "textarea-wrap"
-    const div = document.createElement("div")
-    div.addEventListener("keyup", function() {
-        const ses = window.getSelection()
-        cursorPos.end = ses.anchorOffset
-        cursorPos.start = ses.focusOffset
-        cursorPos.node = ses.baseNode
-    })
-    div.className = "textarea"
-    div.contentEditable = "true"
-    div.spellcheck = false
-    wrap.appendChild(div)
+    const iframe = document.createElement("iframe")
+    iframe.name = "www-iframe"
+        // iframe.body.contentEditable = true
+    wrap.appendChild(iframe)
+        // const div = document.createElement("div")
+        // div.addEventListener("keyup", function() {
+        //     const ses = window.getSelection()
+        //     cursorPos.end = ses.focusOffset
+        //     cursorPos.start = ses.anchorOffset
+        //     cursorPos.node = ses.baseNode
+        //     console.log(cursorPos)
+        // })
+        // div.addEventListener("mouseup", function() {
+        //     const ses = window.getSelection()
+        //     cursorPos.end = ses.focusOffset
+        //     cursorPos.start = ses.anchorOffset
+        //     cursorPos.node = ses.baseNode
+        //     console.log(cursorPos)
+        // })
+        // div.className = "textarea"
+        // div.contentEditable = "true"
+        // div.spellcheck = false
+        // wrap.appendChild(div)
     return wrap
+}
+
+const affterAppend = () => {
+    const iframe = window.frames["www-iframe"]
+    iframe.document.querySelector("body").contentEditable = "true"
 }
 
 //  解析工具栏
@@ -254,6 +271,7 @@ class Editor {
         fragment.appendChild(wrap)
         fragment.appendChild(textarea)
         this.el.appendChild(fragment)
+        affterAppend()
     }
 }
 
