@@ -5,6 +5,11 @@
 </template>
 
 <style>
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
 #app {
   font-family: '微软雅黑';
   -webkit-font-smoothing: antialiased;

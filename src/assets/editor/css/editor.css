@@ -1,3 +1,13 @@
+.www-iframe {
+    border: none;
+    width: 100%;
+    min-height: 300px;
+}
+
+.editor-box {
+    border: 1px solid rgba(0, 0, 0, .05);
+}
+
 .editor-toolbar {
     height: 45px;
     padding: 5px;
@@ -11,6 +21,17 @@
     margin: 8px;
 }
 
+.toolbar-sub .active::before {
+    background: #f1f3f6;
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+}
+
 .toolbar-sub:hover {
     background-color: #f1f3f6;
 }
@@ -20,6 +41,7 @@
     width: 24px;
     height: 24px;
     background: url("../imgs/sprit.svg") no-repeat;
+    position: relative;
 }
 
 .editor-bold {

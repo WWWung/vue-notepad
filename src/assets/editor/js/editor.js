@@ -31,16 +31,16 @@ const createEasyFunc = (toolbar, command) => {
 
 const funcs = {
     bold(toolbar) {
-        createEasyFunc(toolbar, "bold")
+        createEasyFunc.call(this, toolbar, "bold")
     },
     italic(toolbar) {
-        createEasyFunc(toolbar, "italic")
+        createEasyFunc.call(this, toolbar, "italic")
     },
     underline(toolbar) {
-        createEasyFunc(toolbar, "underline")
+        createEasyFunc.call(this, toolbar, "underline")
     },
     lineThrough(toolbar) {
-        createEasyFunc(toolbar, "lineThrough")
+        createEasyFunc.call(this, toolbar, "lineThrough")
     },
     fontSize(toolbar) {
         const div = document.createElement("div")
@@ -133,6 +133,7 @@ const initTextarea = () => {
     const iframe = document.createElement("iframe")
     iframe.name = "www-iframe"
         // iframe.body.contentEditable = true
+    this.iframe = iframe
     wrap.appendChild(iframe)
         // const div = document.createElement("div")
         // div.addEventListener("keyup", function() {
@@ -167,7 +168,7 @@ const parseToolsString = string => {
     var arr = string.split(" ")
     arr.forEach(f => {
         var func = funcs[f]
-        typeof func === "function" && func(fragment)
+        typeof func === "function" && func.call(this, fragment)
     })
     return fragment
 }
@@ -246,9 +247,11 @@ class Editor {
     constructor() {
         this.tools = "bold italic underline lineThrough fontSize"
         this.font_size = "12px 14px 16px 18px 20px 24px 28px"
+        this.el = null
+        this.iframe = null
     }
     init(obj) {
-        document.execCommand("styleWithCSS", false, null)
+        // document.execCommand("styleWithCSS", false, null)
 
         this.el = document.querySelector(obj.el)
         if (!this.el) {
@@ -259,13 +262,15 @@ class Editor {
 
 
         const fragment = document.createDocumentFragment()
+            //  容器
         const wrap = initWrap()
+            //  工具栏
         const toolbar = initToolBarWrap()
-
-        const tools = parseToolsString(this.tools)
+            //  工具栏的操作项
+        const tools = parseToolsString.call(this, this.tools)
         toolbar.appendChild(tools)
 
-        const textarea = initTextarea()
+        const textarea = initTextarea.call(this)
 
         wrap.appendChild(toolbar)
         fragment.appendChild(wrap)
@@ -273,6 +278,9 @@ class Editor {
         this.el.appendChild(fragment)
         affterAppend()
     }
+    afterAppend() {
+
+    }
 }
 
-export default new Editor()
+export default Editor

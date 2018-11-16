@@ -35,7 +35,7 @@ export default {
       },
       setNewType: false,
       newType: "",
-      selectedIndex: -1
+      selectedIndex: 0
     }
   },
 
@@ -50,17 +50,6 @@ export default {
   methods: {
     selectType (index) {
       this.selectedIndex = index
-      // return
-      // var id = this.data.rows[index].id
-      // this.data.rows.forEach((item, i) => {
-      //   if (i === index) {
-      //     this.data.rows[i].selected = true
-      //   } else {
-      //     this.data.rows[i].selected = false
-      //   }
-      //   this.$set(this.data.rows, i, this.data.rows[i])
-      // })
-      // this.$store.commit("setTypeId", id)
     },
     showNewTypeInput () {
       if (!this.setNewType) {
@@ -95,7 +84,6 @@ export default {
       this.invoke("/api/type.api?sort=createTime&sortDir=desc&pageIndex="+this.data.pageIndex+"&rowsInPage="+this.data.rowsInPage, "getList", {}).then(d => {
         if (d.code) {
           this.$message.error(d.data)
-          l.close()
           return
         }
         this.data = d.data
