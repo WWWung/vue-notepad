@@ -1,5 +1,6 @@
 import $ from "../dom/dom.js"
 import Toolbar from "./toolbar/toolbar.js"
+import Selection from "./selection/selection.js"
 
 let idCount = 1;
 
@@ -13,7 +14,7 @@ class Editor {
         this.$iframe = null
         this.id = ""
         this.range = null
-            // this.
+        this.selection = new Selection(this)
     }
     init(options) {
         let id = `www-editor-${idCount++}`
@@ -21,8 +22,38 @@ class Editor {
         this.$el = $(options.el)
 
         initDom.call(this)
+        this.initSelection(true)
+            // this.selection.createRangeByElem()
 
-        afterAppend.call(this)
+        // afterAppend.call(this)
+    }
+    initSelection(newLine) {
+        return
+        const $textElem = this.$textarea
+        const $children = $($textElem[0].children)
+            //  回车换行问题见 http://web.jobbole.com/92919/
+        if (!$children.length) {
+            // 如果编辑器区域无内容，添加一个空行，重新设置选区
+            $textElem.append($('<p><br></p>'))
+            this.initSelection()
+            return
+        }
+
+        const $last = $($children[$children.length - 1])
+
+        if (newLine) {
+            // 新增一个空行
+            const html = $last.html().toLowerCase()
+            const nodeName = $last[0].nodeName
+            if ((html !== '<br>' && html !== '<br\/>') || nodeName !== 'P') {
+                // 最后一个元素不是 <p><br></p>，添加一个空行，重新设置选区
+                $textElem.append($('<p><br></p>'))
+                this.initSelection()
+                return
+            }
+        }
+        this.selection.createRangeByElem($last, false, true)
+        this.selection.restoreSelection()
     }
     getHtmlContent() {
         return this.iframeDocument && this.iframeDocument.body.innerHTML
@@ -30,16 +61,39 @@ class Editor {
     getTextContent() {
         return this.iframeDocument && this.iframeDocument.body.textContent
     }
+    insertHtml(html) {
+        const range = this.selection.getRange()
+        document.execCommand('insertHTML', false, html)
+        console.log(this.queryCommandSupported('insertHTML'))
+        return
+        if (this.queryCommandSupported('insertHTML')) {
+            // W3C
+            document.execCommand('insertHTML', false, html)
+        } else if (range.insertNode) {
+            // IE
+            range.deleteContents()
+            range.insertNode($(html)[0])
+        } else if (range.pasteHTML) {
+            // IE <= 10
+            range.pasteHTML(html)
+        }
+    }
 }
 
 function initDom() {
-    this.$iframe = $(`<iframe id="${this.id}" name="${this.id}" class="www-iframe"></iframe>`)
+    document.execCommand("styleWithCSS", true, null)
     this.$wrap = $(`<div class="editor-box"></div>`)
+    this.$textarea = $(`<div class="editor-textarea" id="${this.id}" contenteditable="true" spellcheck="false"></div>`)
+    const that = this
+        //  编辑器在输入或者鼠标点击的时候会保存选区信息
+    this.$textarea.on("keyup mouseup", function() {
+        that.selection.saveRange()
+    })
 
     this.$toolbar = new Toolbar(this)
     this.$toolbar.init()
 
-    this.$wrap.append(this.$iframe)
+    this.$wrap.append(this.$textarea)
     this.$el.append(this.$wrap)
 }
 
@@ -54,6 +108,11 @@ function afterAppend() {
     this.iframeDocument.execCommand("styleWithCSS", true, null)
 
     createStyleSheet.call(this)
+
+    const that = this
+    $(this.iframeDocument.body).on("keyup", function() {
+        that.selection.saveRange()
+    })
 }
 
 //  创建样式表
@@ -69,7 +128,23 @@ function createStyleSheet() {
 function initToolbar() {
     const str = this.options.tools
     const tools = str.split(" ")
-    console.log(tools)
+}
+
+function insertHtml(html) {
+    const editor = this.editor
+    const range = editor.selection.getRange()
+
+    if (this.queryCommandSupported('insertHTML')) {
+        // W3C
+        this._execCommand('insertHTML', html)
+    } else if (range.insertNode) {
+        // IE
+        range.deleteContents()
+        range.insertNode($(html)[0])
+    } else if (range.pasteHTML) {
+        // IE <= 10
+        range.pasteHTML(html)
+    }
 }
 
 export default Editor

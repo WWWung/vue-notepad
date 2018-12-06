@@ -1,5 +1,6 @@
-const querySelectorAll = selector => {
-    const rsl = document.querySelectorAll(selector)
+const querySelectorAll = (selector, win) => {
+    const doc = win ? win.document : document
+    const rsl = doc.querySelectorAll(selector)
     if (isDomList(rsl)) {
         return rsl
     } else {
@@ -21,12 +22,13 @@ const isDomList = selector => {
     return rsl
 }
 
-const getStyleObj = el => {
-    return el && window.getComputedStyle(el, null)
+const getStyleObj = (el, win) => {
+    const w = wind ? win : window
+    return el && w.getComputedStyle(el, null)
 }
 
-const getStyle = (el, css) => {
-    const style = getStyleObj(el)
+const getStyle = (el, css, win) => {
+    const style = getStyleObj(el, win)
     return style && style[css]
 }
 
@@ -35,10 +37,11 @@ const setStyle = (el, cssName, cssValue) => {
 }
 
 class ElementMaker {
-    constructor(selector) {
+    constructor(selector, win) {
         if (!selector) {
             return
         }
+        this._window = win || window
         if (selector instanceof ElementMaker) {
             return selector
         }
@@ -50,7 +53,7 @@ class ElementMaker {
                 elementList = createElementByHtml(selector)
             } else {
                 //  #id .class
-                elementList = querySelectorAll(selector)
+                elementList = querySelectorAll(selector, win)
             }
         } else if (nodeType === 1 || nodeType === 9)(
             elementList = [selector]
@@ -140,7 +143,7 @@ class ElementMaker {
                 }
                 return this
             } else {
-                return this[0] && getStyle(this[0], cssName)
+                return this[0] && getStyle(this[0], cssName, this._window)
             }
         }
         return this.forEach(el => {
@@ -164,10 +167,52 @@ class ElementMaker {
             })
         })
     }
+
+    remove() {
+        return this.forEach(el => {
+            if (el && el.remove) {
+                el.remove()
+            } else {
+                const parent = el.parentElement
+                parent && parent.removeChild(el)
+            }
+        })
+    }
+
+    html(html) {
+        return html ? this.forEach(el => {
+            el.innerHTML = html
+        }) : this[0].innerHTML
+    }
+
+    text(text) {
+
+    }
+
+    parent(el) {
+        return $(el ? el.parentElement : this[0].parentElement)
+    }
+
+    findParent(selector, curr) {
+        if (curr && curr.nodeName.toLowerCase() === "html") {
+            return null
+        }
+        const els = this._window.document.querySelectorAll(selector)
+        if (!els.length) {
+            return null
+        }
+        const el = curr || this[0]
+        for (let i = 0; i < els.length; i++) {
+            if (els[i] === el.parentNode) {
+                return els[i]
+            }
+        }
+        return this.findParent(selector.curr.parentNode)
+    }
 }
 
-function $(selector) {
-    return new ElementMaker(selector)
+function $(selector, win) {
+    return new ElementMaker(selector, win)
 }
 
 export default $

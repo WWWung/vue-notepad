@@ -21,9 +21,32 @@ function createEasyFuncBtn(command) {
     const $a = $(`<a href="javascript:;" class="easyFunc editor-${command}" title="${command}"></a>`)
         //  添加事件
     if (typeof events[command] === "function") {
-        const that = this
+        const sel = this.editor.selection
         $a.on("click", function() {
-            events[command](that)
+            if ($(this).hasClass("active")) {
+                $(this).removeClass("active")
+            } else {
+                $(this).addClass("active")
+            }
+            // window.getSelection()
+            //  直接设置没有效果，尝试加定时器之后好了，原因未知...
+            //  在有拖蓝的情况下，直接execCommand有效果，没有拖蓝的时候没有效果
+            //  解决方案:
+            //      1. 加定时器
+
+            setTimeout(function() {
+                events[command]()
+            })
+
+            //      2. createEmptyRange 创建一个空(&#8203;)的拖蓝
+            // sel.createEmptyRange()
+            // sel.restoreSelection()
+            // events[command]()
+
+            sel.saveRange()
+            sel.restoreSelection()
+
+
         })
     }
     this.$el.append($wrap.append($a))
@@ -31,19 +54,19 @@ function createEasyFuncBtn(command) {
 
 const events = {
     bold(that) {
-        that.iframeDocument.execCommand("bold", false, null)
+        document.execCommand("bold", false, null)
     },
     italic(that) {
-        that.iframeDocument.execCommand("italic", false, null)
+        document.execCommand("italic", false, null)
     },
     underline(that) {
-        that.iframeDocument.execCommand("underline", false, null)
+        document.execCommand("underline", false, null)
     },
     lineThrough(that) {
-        that.iframeDocument.execCommand("strikeThrough", false, null)
+        document.execCommand("strikeThrough", false, null)
     },
     fontSize(e, size) {
-        this.iframeDocument.execCommand("fontSize", false, size)
+        document.execCommand("fontSize", false, size)
     }
 }
 
