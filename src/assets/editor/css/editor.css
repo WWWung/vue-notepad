@@ -92,11 +92,8 @@
 
 .editor-select {
     font-size: 12px;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    position: relative;
+    padding: 2px;
+    outline: none;
 }
 
 .editor-select-options {

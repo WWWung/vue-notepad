@@ -189,6 +189,12 @@ class ElementMaker {
 
     }
 
+    val(val) {
+        return val ? this.forEach(el => {
+            el.value = val
+        }) : this[0].value
+    }
+
     parent(el) {
         return $(el ? el.parentElement : this[0].parentElement)
     }

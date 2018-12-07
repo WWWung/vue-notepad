@@ -18,10 +18,25 @@ class Toolbar {
 
 function createEasyFuncBtn(command) {
     const $wrap = $(`<div class="toolbar-sub"></div>`)
+    const sel = this.editor.selection
+    if (command === `fontSize`) {
+        const options = {
+            el: $wrap,
+            ops: `1 2 3 4 5 6 7`,
+            event(e) {
+                const fontSize = $(this).val()
+                execCommand(command, fontSize)
+                sel.saveRange()
+                sel.restoreSelection()
+            }
+        }
+        createSelectBtn(options)
+        this.$el.append($wrap)
+        return
+    }
     const $a = $(`<a href="javascript:;" class="easyFunc editor-${command}" title="${command}"></a>`)
         //  添加事件
     if (typeof events[command] === "function") {
-        const sel = this.editor.selection
         $a.on("click", function() {
             if ($(this).hasClass("active")) {
                 $(this).removeClass("active")
@@ -34,9 +49,7 @@ function createEasyFuncBtn(command) {
             //  解决方案:
             //      1. 加定时器
 
-            setTimeout(function() {
-                events[command]()
-            })
+            execCommand(command, null)
 
             //      2. createEmptyRange 创建一个空(&#8203;)的拖蓝
             // sel.createEmptyRange()
@@ -52,6 +65,21 @@ function createEasyFuncBtn(command) {
     this.$el.append($wrap.append($a))
 }
 
+function createSelectBtn(options) {
+    if (!options.el) {
+        return
+    }
+    const $el = $(options.el)
+    const ops = options.ops ? options.ops.split(" ") : []
+    const event = options.event || null
+    const $select = $(`<select class="editor-select"></selecti>`)
+    ops.forEach(op => {
+        $select.append($(`<option value="${op}" class="ops">${op}</option>`))
+    })
+    $select.on("change", event)
+    $el.append($select)
+}
+
 const events = {
     bold(that) {
         document.execCommand("bold", false, null)
@@ -65,9 +93,15 @@ const events = {
     lineThrough(that) {
         document.execCommand("strikeThrough", false, null)
     },
-    fontSize(e, size) {
+    fontSize(size) {
         document.execCommand("fontSize", false, size)
     }
+}
+
+function execCommand(command, param) {
+    setTimeout(function() {
+        document.execCommand(command, false, param)
+    })
 }
 
 export default Toolbar
