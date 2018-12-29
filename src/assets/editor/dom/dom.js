@@ -186,7 +186,9 @@ class ElementMaker {
     }
 
     text(text) {
-
+        return text ? this.forEach(el => {
+            el.innerText = text
+        }) : this[0].innerText
     }
 
     val(val) {

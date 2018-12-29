@@ -7,7 +7,7 @@ let idCount = 1;
 class Editor {
     constructor() {
         this.options = {
-            tools: "bold italic underline lineThrough fontSize",
+            tools: "bold italic underline lineThrough fontSize foreColor link code",
             fontSize: "12px 14px 16px 18px 20px 24px 28px"
         }
         this.$el = null

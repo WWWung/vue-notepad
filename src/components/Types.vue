@@ -87,13 +87,28 @@ export default {
           return
         }
         this.data = d.data
+        if (this.selectedIndex >= this.data.rows.length) {
+          this.selectedIndex = 0
+        }
         typeof cb === "function" && cb()
       })
     },
     deleteType(e, index) {
       //  阻止冒泡触发父集li的选中事件
       e.stopPropagation()
-      this.data.rows.splice(index, 1)
+      // this.data.rows.splice(index, 1)
+      this.$confirm('该分类下的笔记将会一并删除并不可找回,请确认是否删除!').then(_ => {
+        this.invoke('/api/type.api', 'delete', { id: this.data.rows[index].id }).then(d => {
+          if (d.code) {
+            this.$message.error(d.data)
+          } else {
+            this.initData()
+            this.$message('删除成功')
+          }
+        })
+      }).catch(err => {
+        console.log(err)
+      })
     }
   },
 

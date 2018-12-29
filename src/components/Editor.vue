@@ -24,6 +24,7 @@
 <script>
 import Editor from "../assets/editor/js/editor3.js"
 import "../assets/editor/css/editor.css"
+import "../assets/editor/prism/prism.css"
 export default {
     name: "",
     data () {

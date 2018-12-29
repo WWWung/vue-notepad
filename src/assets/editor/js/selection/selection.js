@@ -50,6 +50,16 @@ class Selection {
         }
         return false
     }
+    getSelectionContainerElem(range) {
+        range = range || this.range
+        let elem
+        if (range) {
+            elem = range.commonAncestorContainer
+            return $(
+                elem.nodeType === 1 ? elem : elem.parentNode
+            )
+        }
+    }
     createEmptyRange() {
         const editor = this.editor
         let $elem
